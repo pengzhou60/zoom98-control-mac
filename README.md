@@ -1,67 +1,63 @@
 # Zoom98 Control for macOS
 
-一款非官方、原生 SwiftUI 的 Zoom98 键盘配置工具。它通过 macOS IOKit 直接访问键盘的
-32 字节 VIA HID 接口，不需要常驻后台。
+An unofficial, native SwiftUI configuration utility for the Zoom98 keyboard. It communicates directly with the keyboard's 32-byte VIA HID interface through macOS IOKit and does not require a background service.
 
-> 本项目与 Meletrix、Wuque Studio 没有隶属或授权关系。请先导出配置，并自行承担修改
-> 键位、灯效与宏的风险。
+> This project is not affiliated with, endorsed by, or authorized by Meletrix or Wuque Studio. Export a backup before making changes, and use keymap, lighting, and macro features at your own risk.
 
-![键位编辑界面](design-audit/current/01-keymap.png)
+![Keymap editor](design-audit/current/01-keymap.png)
 
-## 当前功能
+## Features
 
-- 识别 USB Zoom98（VID `0x1EA7` / PID `0xCD68`）
-- 读取和调整轴下灯（RGB Matrix）的颜色、亮度、速度和已识别灯效
-- 用接近 Zoom98 实物的布局读取和编辑主键层与 Fn 层
-- 支持普通键、macOS 可用媒体键以及 16 个固件文本宏
-- 写入后回读校验，并支持撤销最近一次改键
-- 导入、导出 JSON 配置，并在导入异常时回滚
-- 通过 BLE 连接 `Zoom98 Screen`，读取固件信息和发送已确认的屏幕命令
-- 尝试从独立的 BLE HID 电量服务读取键盘电量
+- Detects a Zoom98 connected over USB (VID `0x1EA7`, PID `0xCD68`)
+- Reads and configures the per-key RGB Matrix color, brightness, speed, and recognized effects
+- Displays a layout modeled after the physical Zoom98 keyboard
+- Reads and edits the primary and Fn layers
+- Supports standard keys, macOS-compatible media keys, and 16 firmware text macros
+- Reads settings back after writing for verification and can undo the most recent keymap change
+- Imports and exports JSON configurations, with rollback when an import fails
+- Connects to `Zoom98 Screen` over BLE to read firmware information and send verified screen commands
+- Attempts to read keyboard battery level from the keyboard's separate BLE HID battery service
 
-## 已知限制
+## Known Limitations
 
-- 当前 Zoom98 固件虽然会保存 QMK 组合键码，但实测不会执行，因此界面不再提供组合键写入
-- `KC_CALC`、邮件、浏览器等 Windows 消费控制键在 macOS 上没有对应系统动作
-- 文本宏受键盘固件容量和 ASCII 字符集限制
-- 屏幕与键盘控制器是两个 BLE 设备；屏幕连接本身不能提供键盘电量
-- 蓝牙广播名称没有公开的可写 `Device Name (2A00)` 特征，当前无法可靠改名
-- 侧边灯条（Bottom Light）可由固件快捷键独立控制，但尚未找到可用的软件协议
+- The current Zoom98 firmware stores QMK combination keycodes but does not execute them in testing, so the app no longer offers combination-key assignments
+- Windows consumer-control keys such as `KC_CALC`, Mail, and Browser do not have equivalent system actions on macOS
+- Text macros are limited by the keyboard firmware's storage capacity and ASCII character support
+- The screen and keyboard controller appear as two separate BLE devices; connecting to the screen does not provide keyboard battery information
+- The keyboard does not expose a writable Bluetooth `Device Name (2A00)` characteristic, so its advertised name cannot currently be changed reliably
+- The side light bar (Bottom Light) can be controlled independently with firmware shortcuts, but a working software-control protocol has not yet been identified
 
-## 系统要求
+## Requirements
 
-- macOS 14 或更高版本
-- Apple Silicon Mac（当前发布包为 arm64）
-- 使用配置功能时通过 USB 连接 Zoom98
-- 首次访问 HID 接口时，可能需要为 App 开启“输入监控”权限
+- macOS 14 or later
+- Apple Silicon Mac (the current release build is arm64)
+- A USB connection to the Zoom98 for configuration features
+- Input Monitoring permission may be required the first time the app accesses the HID interface
 
-## 构建
+## Build
 
-生成可双击的 App：
+Create a double-clickable app bundle:
 
 ```sh
 ./scripts/build-app.sh
 ```
 
-输出位于 `dist/Zoom98 Control.app`。
+The result is written to `dist/Zoom98 Control.app`.
 
-开发运行：
+Run directly for development:
 
 ```sh
 swift run
 ```
 
-发布包采用本机临时签名，并未经过 Apple Developer ID 公证。其他 Mac 第一次打开时可能需要
-在“系统设置 → 隐私与安全性”中确认。
+Release builds use local ad-hoc code signing and are not notarized with an Apple Developer ID. On first launch, another Mac may require approval under **System Settings → Privacy & Security**.
 
-## 侧边灯条研究结论
+## Side Light Research
 
-官方固件确实把 Bottom Light 与轴下灯分开控制，但目前发现的 VIA 命令和厂商私有
-`ReadFirmwareLightEffect` 命令都只返回轴下灯状态。扫描私有字段也没有找到第二组灯光值。
-因此本工具只展示已确认的固件快捷键，不把无响应的 VIA `RGB Light` 字段伪装成可用控件。
-要实现真正的软件侧灯控制，需要继续逆向或修改键盘固件，新增一个 HID 命令。
+The official firmware controls the Bottom Light separately from the per-key RGB Matrix. However, the VIA commands tested so far—and the vendor-specific `ReadFirmwareLightEffect` command—only return the per-key lighting state. Scanning the private command fields did not reveal a second set of lighting values.
 
-## 仓库内容
+For that reason, Zoom98 Control only presents firmware shortcuts that have been verified. It does not expose an unresponsive VIA `RGB Light` field as if it were functional. True software control of the side light will require further protocol research or a custom firmware command.
 
-本仓库只收录 macOS 工具源码、构建脚本和设计资料，不包含厂商 APK、Windows 驱动、
-固件镜像或反编译数据库。可运行 ZIP 请从 GitHub Releases 下载。
+## Repository Contents
+
+This repository contains only the macOS application source, build scripts, and design-review materials. It does not include the vendor APK, Windows drivers, firmware images, or reverse-engineering databases. Download the runnable ZIP from [GitHub Releases](https://github.com/pengzhou60/zoom98-control-mac/releases).

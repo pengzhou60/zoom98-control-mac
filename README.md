@@ -1,10 +1,11 @@
-# Zoom98 Control for macOS
+<img width="952" height="390" alt="image" src="https://github.com/user-attachments/assets/01f597e1-e647-49d3-a2d7-efcd3b61d687" /># Zoom98 Control for macOS
 
 An unofficial, native SwiftUI configuration utility for the Zoom98 keyboard. It communicates directly with the keyboard's 32-byte VIA HID interface through macOS IOKit and does not require a background service.
 
 > This project is not affiliated with, endorsed by, or authorized by Meletrix or Wuque Studio. Export a backup before making changes, and use keymap, lighting, and macro features at your own risk.
 
-![Keymap editor](design-audit/current/01-keymap.png)
+![Uploading image.png…]()
+
 
 ## Features
 

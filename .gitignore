@@ -1,0 +1,18 @@
+.DS_Store
+.build/
+.build-*/
+DerivedData/
+*.xcuserstate
+
+# Local build products are distributed through GitHub Releases.
+dist/
+
+# Local logs and reverse-engineering databases.
+*.log
+*.db
+
+# Superseded visual drafts and third-party UI references.
+App/Artwork/Zoom98-Telescope-Logo-v1.png
+App/Artwork/Zoom98-Telescope-Logo-v2-Liquid-Glass.png
+design-audit/01-keymap-current.png
+design-audit/02-logitech-actions-reference.png
